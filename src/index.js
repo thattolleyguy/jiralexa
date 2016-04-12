@@ -3,7 +3,7 @@
  * Examples:
  * One-shot model:
  *  User: "Alexa, ask Jira what's the number of open tickets for CAMEL?"
- *  Alexa: "(reads all jira tickets related to the project)"
+ *  Alexa: "(queries Jira REST api and finds the number of tickets)"
  */
 
 'use strict';
@@ -53,30 +53,48 @@ JiraManager.prototype.intentHandlers = {
             }
         }
 
-        request({
-            url: config.endpoint,
-            method: "POST",
-            json: true,
-            body: {
-                "jql": jql,
-                "maxResults": config.maxResults
-            },
-            headers: {
-                "Authorization": "Basic " + (new Buffer(config.username + ":" + config.password)).toString("base64"),
-                "Accept": "application/json"
+        var jiraResponse = new JiraRestHelper(jql);
+        console.log(jql, jiraResponse);
+
+        if (jiraResponse.error) {
+            console.log(jiraResponse.error, jiraResponse.body);
+            if (hasTicketNumber) {
+                speech = "" +
+                    "<speak>" +
+                    "I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
+                    "</speak>";
+            } else {
+                speech = "" +
+                    "<speak>" +
+                    "I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() +
+                    "</speak>";
             }
-        }, function (error, response, body) {
-            if (error) {
-                console.log(error, body);
-                if (hasTicketNumber) {
+            speechOutput = {
+                speech: speech,
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            repromptOutput = {
+                speech: "What else can I help with?",
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            alexaResponse.ask(speechOutput, repromptOutput);
+        } else {
+            console.log(jiraResponse.response.statusCode, jiraResponse.body);
+            if (hasTicketNumber) {
+                if (jiraResponse.body.total === 0) {
                     speech = "" +
                         "<speak>" +
-                        "I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
+                        "I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
                         "</speak>";
                 } else {
                     speech = "" +
                         "<speak>" +
-                        "I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() +
+                        "<p>" + "The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:" + "</p>" +
+                        "<p>" + "Description: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.summary + "</p>" +
+                        "<p>" + "Priority: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.priority.name + "</p>" +
+                        "<p>" + "Reporter: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.reporter.name + "</p>" +
+                        "<p>" + "Type: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.issuetype.name + "</p>" +
+                        "<p>" + "Status: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.status.name + "</p>" +
                         "</speak>";
                 }
                 speechOutput = {
@@ -89,42 +107,13 @@ JiraManager.prototype.intentHandlers = {
                 };
                 alexaResponse.ask(speechOutput, repromptOutput);
             } else {
-                console.log(response.statusCode, body);
-                if (hasTicketNumber) {
-                    if (body.total === 0) {
-                        speech = "" +
-                            "<speak>" +
-                            "I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
-                            "</speak>";
-                    } else {
-                        speech = "" +
-                            "<speak>" +
-                            "<p>" + "The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:" + "</p>" +
-                            "<p>" + "Description: " + "<break time='0.5s'/>" + body.issues[0].fields.summary + "</p>" +
-                            "<p>" + "Priority: " + "<break time='0.5s'/>" + body.issues[0].fields.priority.name + "</p>" +
-                            "<p>" + "Reporter: " + "<break time='0.5s'/>" + body.issues[0].fields.reporter.name + "</p>" +
-                            "<p>" + "Type: " + "<break time='0.5s'/>" + body.issues[0].fields.issuetype.name + "</p>" +
-                            "<p>" + "Status: " + "<break time='0.5s'/>" + body.issues[0].fields.status.name + "</p>" +
-                            "</speak>";
-                    }
-                    speechOutput = {
-                        speech: speech,
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    repromptOutput = {
-                        speech: "What else can I help with?",
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    alexaResponse.ask(speechOutput, repromptOutput);
-                } else {
-                    speechOutput = {
-                        speech: "<speack>" + "There are " + "<break time='1s'/>" + body.total + " tickets found with the specified criteria " + "</speak>",
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    alexaResponse.tell(speechOutput);
-                }
+                speechOutput = {
+                    speech: "<speack>" + "There are " + "<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria " + "</speak>",
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                alexaResponse.tell(speechOutput);
             }
-        });
+        }
     },
     "GetDeveloperStatus": function (intent, session, alexaResponse) {
         var usernameSlot = intent.slots.Username;
