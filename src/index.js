@@ -1,14 +1,16 @@
 /**
- * This sample shows how to create a Lambda function for handling Alexa Skill requests that:
+ * Lambda function for handling Alexa Skill requests that uses Jira REST api through JQL (Jira Query Language):
  * Examples:
  * One-shot model:
- *  User: "Alexa, ask Jira what's the number of open tickets for Spring?"
+ *  User: "Alexa, ask Jira what's the number of open tickets for CAMEL?"
  *  Alexa: "(reads all jira tickets related to the project)"
  */
 
 'use strict';
 
 var AlexaSkill = require('./AlexaSkill');
+
+var JiraRestHelper = require('./JiraRestHelper');
 
 var config = require('./config.json');
 
@@ -97,12 +99,12 @@ JiraManager.prototype.intentHandlers = {
                     } else {
                         speech = "" +
                             "<speak>" +
-                            "<p>" + "The Summary for ticket " + projectSlot.value + " <say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as> " + "is the following:" + "</p>" +
+                            "<p>" + "The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:" + "</p>" +
                             "<p>" + "Description: " + "<break time='0.5s'/>" + body.issues[0].fields.summary + "</p>" +
                             "<p>" + "Priority: " + "<break time='0.5s'/>" + body.issues[0].fields.priority.name + "</p>" +
                             "<p>" + "Reporter: " + "<break time='0.5s'/>" + body.issues[0].fields.reporter.name + "</p>" +
                             "<p>" + "Type: " + "<break time='0.5s'/>" + body.issues[0].fields.issuetype.name + "</p>" +
-                            "<p>" + "Status:  " + "<break time='0.5s'/>" + body.issues[0].fields.status.name + "</p>" +
+                            "<p>" + "Status: " + "<break time='0.5s'/>" + body.issues[0].fields.status.name + "</p>" +
                             "</speak>";
                     }
                     speechOutput = {
@@ -116,7 +118,7 @@ JiraManager.prototype.intentHandlers = {
                     alexaResponse.ask(speechOutput, repromptOutput);
                 } else {
                     speechOutput = {
-                        speech: "<speack>" + "There are " + "<break time='0.5s'/>" + body.total + " tickets found with the specified criteria" + "</speak>",
+                        speech: "<speack>" + "There are " + "<break time='1s'/>" + body.total + " tickets found with the specified criteria " + "</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.tell(speechOutput);
@@ -124,16 +126,30 @@ JiraManager.prototype.intentHandlers = {
             }
         });
     },
+    "GetDeveloperStatus": function (intent, session, alexaResponse) {
+        var usernameSlot = intent.slots.Username;
+        var projectSlot = intent.slots.Project;
+        var statusSlot = intent.slots.Status;
+
+        var hasStatus = statusSlot && statusSlot.value,
+            jql;
+
+        if (hasStatus) {
+            jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
+        } else {
+            jql = "project=" + projectSlot.value.toUpperCase() + " AND status = " + statusSlot.value + " AND assignee = " + usernameSlot.value;
+        }
+        var request = new JiraRestHelper(jql);
+        console.log(jql, request);
+    },
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
         response.tell(speechOutput);
     },
-
     "AMAZON.CancelIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
         response.tell(speechOutput);
     },
-
     "AMAZON.HelpIntent": function (intent, session, response) {
         var speechText = "You can ask questions about Jira Status such as, what's the number of open tickets for Spring, or, you can say exit... Now, what can I help you with?";
         var repromptText = "You can say things like, what's the number of open tickets for Spring, or you can say exit... Now, what can I help you with?";
