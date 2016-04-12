@@ -71,12 +71,12 @@ JiraManager.prototype.intentHandlers = {
                 if (hasTicketNumber) {
                     speech = "" +
                         "<speak>" +
-                        "I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() +
+                        "I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
                         "</speak>";
                 } else {
                     speech = "" +
                         "<speak>" +
-                        "I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
+                        "I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() +
                         "</speak>";
                 }
                 speechOutput = {
@@ -131,16 +131,71 @@ JiraManager.prototype.intentHandlers = {
         var projectSlot = intent.slots.Project;
         var statusSlot = intent.slots.Status;
 
-        var hasStatus = statusSlot && statusSlot.value,
-            jql;
+        var hasStatus = statusSlot && statusSlot.value;
+        var jql, speechOutput, repromptOutput, speech;
 
         if (hasStatus) {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status = " + statusSlot.value + " AND assignee = " + usernameSlot.value;
         } else {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
         }
-        var response = new JiraRestHelper(jql);
-        console.log(jql, response);
+
+        var jiraResponse = new JiraRestHelper(jql);
+        console.log(jql, jiraResponse);
+
+        if (jiraResponse.error) {
+            console.log(jiraResponse.error, jiraResponse.body);
+            if (hasStatus) {
+                speech = "" +
+                    "<speak>" +
+                    "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value
+                "</speak>";
+            } else {
+                speech = "" +
+                    "<speak>" +
+                    "I'm sorry, I currently cannot find tickets for user " + statusSlot.value + " and project " + projectSlot.value.toUpperCase()
+                "</speak>";
+            }
+            speechOutput = {
+                speech: speech,
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            repromptOutput = {
+                speech: "What else can I help with?",
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            alexaResponse.ask(speechOutput, repromptOutput);
+        } else {
+            console.log(jiraResponse.response.statusCode, jiraResponse.body);
+            if (hasStatus) {
+                if (jiraResponse.body.total === 0) {
+                    speech = "" +
+                        "<speak>" +
+                        "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value
+                    "</speak>";
+                } else {
+                    speech = "" +
+                        "<speak>" +
+                        "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase()
+                    "</speak>";
+                }
+                speechOutput = {
+                    speech: speech,
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                repromptOutput = {
+                    speech: "What else can I help with?",
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                alexaResponse.ask(speechOutput, repromptOutput);
+            } else {
+                speechOutput = {
+                    speech: "<speack>" + "There are " + "<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria " + "</speak>",
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                alexaResponse.tell(speechOutput);
+            }
+        }
     },
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
