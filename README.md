@@ -9,8 +9,8 @@ To run this example skill you need to do two things. The first is to deploy the 
 3. Skip the blueprint
 4. Name the Lambda Function "Jira".
 5. Select the runtime as Node.js
-6. Go to the the src directory, execute `npm install --save request jira-connector alexa-skill aws` inside your source folder.
-7. Select all files and then create a zip file, make sure the zip file does not contain the src directory itself, otherwise Lambda function will not work.
+6. Go to the the root directory directory, execute `./gradlew clean buildAlexaSkillZip`.
+7. Select the zip file inside the location `./build/distribution/jiralexa-0.0.1.zip`.
 8. Select Code entry type as "Upload a .ZIP file" and then upload the .zip file to the Lambda
 9. Keep the Handler as index.handler (this refers to the main js file in the zip).
 10. Create a basic execution role and click create.

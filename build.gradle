@@ -22,7 +22,7 @@ repositories {
     mavenCentral()
 }
 
-task builAlexaSkillZip(type: Zip, dependsOn: npmInstall) {
+task buildAlexaSkillZip(type: Zip, dependsOn: npmInstall) {
     from('node_modules') {
         into '/'
     }
