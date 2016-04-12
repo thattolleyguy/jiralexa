@@ -135,12 +135,12 @@ JiraManager.prototype.intentHandlers = {
             jql;
 
         if (hasStatus) {
-            jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
-        } else {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status = " + statusSlot.value + " AND assignee = " + usernameSlot.value;
+        } else {
+            jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
         }
-        var request = new JiraRestHelper(jql);
-        console.log(jql, request);
+        var response = new JiraRestHelper(jql);
+        console.log(jql, response);
     },
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
