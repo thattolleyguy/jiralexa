@@ -50,7 +50,7 @@ JiraManager.prototype.intentHandlers = {
                 jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
             }
         }
-
+        console.log(jql);
         return request({
             url: config.endpoint,
             method: "POST",
@@ -129,7 +129,7 @@ JiraManager.prototype.intentHandlers = {
         } else {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) " + " AND assignee = " + usernameSlot.value + " ORDER BY created DESC";
         }
-
+        console.log(jql);
         return request({
             url: config.endpoint,
             method: "POST",
@@ -178,7 +178,7 @@ JiraManager.prototype.intentHandlers = {
                     alexaResponse.ask(speechOutput, repromptOutput);
                 } else {
                     speechOutput = {
-                        speech: "<speack>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
+                        speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.tell(speechOutput);
