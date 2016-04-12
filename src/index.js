@@ -125,9 +125,9 @@ JiraManager.prototype.intentHandlers = {
         var jql, speechOutput, repromptOutput, speech;
 
         if (hasStatus) {
-            jql = "project=" + projectSlot.value.toUpperCase() + " AND status = " + statusSlot.value + " AND assignee = " + usernameSlot.value;
+            jql = "project=" + projectSlot.value.toUpperCase() + " AND status = " + statusSlot.value + " AND assignee = '" + usernameSlot.value + "'";
         } else {
-            jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
+            jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) " + " AND assignee = " + usernameSlot.value + " ORDER BY created DESC";
         }
 
         return request({
