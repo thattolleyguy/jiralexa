@@ -59,15 +59,9 @@ JiraManager.prototype.intentHandlers = {
         if (jiraResponse.error) {
             console.log(jiraResponse.error, jiraResponse.body);
             if (hasTicketNumber) {
-                speech = "" +
-                    "<speak>" +
-                    "I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
-                    "</speak>";
+                speech = "<speak>I'm sorry, I currently do not know the status for ticket: " + projectSlot.value.toUpperCase() + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as></speak>";
             } else {
-                speech = "" +
-                    "<speak>" +
-                    "I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() +
-                    "</speak>";
+                speech = "<speak>I'm sorry, I currently do not know the status for project: " + projectSlot.value.toUpperCase() + "</speak>";
             }
             speechOutput = {
                 speech: speech,
@@ -82,19 +76,16 @@ JiraManager.prototype.intentHandlers = {
             console.log(jiraResponse.response.statusCode, jiraResponse.body);
             if (hasTicketNumber) {
                 if (jiraResponse.body.total === 0) {
-                    speech = "" +
-                        "<speak>" +
-                        "I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as>" +
-                        "</speak>";
+                    speech = "<speak>I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as></speak>";
                 } else {
                     speech = "" +
                         "<speak>" +
-                        "<p>" + "The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:" + "</p>" +
-                        "<p>" + "Description: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.summary + "</p>" +
-                        "<p>" + "Priority: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.priority.name + "</p>" +
-                        "<p>" + "Reporter: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.reporter.name + "</p>" +
-                        "<p>" + "Type: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.issuetype.name + "</p>" +
-                        "<p>" + "Status: " + "<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.status.name + "</p>" +
+                        "<p>The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:</p>" +
+                        "<p>Description:<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.summary + "</p>" +
+                        "<p>Priority:<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.priority.name + "</p>" +
+                        "<p>Reporter:<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.reporter.name + "</p>" +
+                        "<p>Type:<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.issuetype.name + "</p>" +
+                        "<p>Status:<break time='0.5s'/>" + jiraResponse.body.issues[0].fields.status.name + "</p>" +
                         "</speak>";
                 }
                 speechOutput = {
@@ -108,7 +99,7 @@ JiraManager.prototype.intentHandlers = {
                 alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 speechOutput = {
-                    speech: "<speack>" + "There are " + "<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria " + "</speak>",
+                    speech: "<speack>There are<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
                 alexaResponse.tell(speechOutput);
@@ -135,15 +126,9 @@ JiraManager.prototype.intentHandlers = {
         if (jiraResponse.error) {
             console.log(jiraResponse.error, jiraResponse.body);
             if (hasStatus) {
-                speech = "" +
-                    "<speak>" +
-                    "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value
-                "</speak>";
+                speech = "<speak>I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value + "</speak>";
             } else {
-                speech = "" +
-                    "<speak>" +
-                    "I'm sorry, I currently cannot find tickets for user " + statusSlot.value + " and project " + projectSlot.value.toUpperCase()
-                "</speak>";
+                speech = "<speak>I'm sorry, I currently cannot find tickets for user " + statusSlot.value + " and project " + projectSlot.value.toUpperCase() + "</speak>";
             }
             speechOutput = {
                 speech: speech,
@@ -158,15 +143,9 @@ JiraManager.prototype.intentHandlers = {
             console.log(jiraResponse.response.statusCode, jiraResponse.body);
             if (hasStatus) {
                 if (jiraResponse.body.total === 0) {
-                    speech = "" +
-                        "<speak>" +
-                        "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value
-                    "</speak>";
+                    speech = "<speak>I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value + "</speak>";
                 } else {
-                    speech = "" +
-                        "<speak>" +
-                        "I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase()
-                    "</speak>";
+                    speech = "<speak>I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + "</speak>";
                 }
                 speechOutput = {
                     speech: speech,
@@ -179,7 +158,7 @@ JiraManager.prototype.intentHandlers = {
                 alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 speechOutput = {
-                    speech: "<speack>" + "There are " + "<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria " + "</speak>",
+                    speech: "<speack>There are<break time='1s'/>" + jiraResponse.body.total + " tickets found with the specified criteria</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
                 alexaResponse.tell(speechOutput);
