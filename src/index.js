@@ -108,7 +108,7 @@ JiraManager.prototype.intentHandlers = {
                     alexaResponse.ask(speechOutput, repromptOutput);
                 } else {
                     speechOutput = {
-                        speech: "<speack>There are<break time='1s'/>" + body.total + " tickets found with the specified criteria</speak>",
+                        speech: "<speak>There are<break strenght='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.tell(speechOutput);
@@ -178,7 +178,7 @@ JiraManager.prototype.intentHandlers = {
                     alexaResponse.ask(speechOutput, repromptOutput);
                 } else {
                     speechOutput = {
-                        speech: "<speack>There are<break time='1s'/>" + body.total + " tickets found with the specified criteria</speak>",
+                        speech: "<speack>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.tell(speechOutput);
