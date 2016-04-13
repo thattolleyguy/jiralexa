@@ -10,7 +10,7 @@
 
 var AlexaSkill = require('./AlexaSkill');
 
-var config = require('./config.json');
+var config = require('./config');
 
 var request = require('request');
 
