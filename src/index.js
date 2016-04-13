@@ -82,7 +82,6 @@ JiraManager.prototype.intentHandlers = {
                 alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 console.log(response.statusCode, body);
-                console.log(response.statusCode, body);
                 if (hasTicketNumber) {
                     if (body.total === 0) {
                         speech = "<speak>I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as></speak>";
@@ -161,28 +160,11 @@ JiraManager.prototype.intentHandlers = {
                 alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 console.log(response.statusCode, body);
-                if (hasStatus) {
-                    if (body.total === 0) {
-                        speech = "<speak>I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + " with status " + statusSlot.value + "</speak>";
-                    } else {
-                        speech = "<speak>I'm sorry, I currently cannot find tickets for user " + usernameSlot.value + " and project " + projectSlot.value.toUpperCase() + "</speak>";
-                    }
-                    speechOutput = {
-                        speech: speech,
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    repromptOutput = {
-                        speech: "What else can I help with?",
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    alexaResponse.ask(speechOutput, repromptOutput);
-                } else {
-                    speechOutput = {
-                        speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    alexaResponse.tell(speechOutput);
-                }
+                speechOutput = {
+                    speech: "<speak>There are<break strength='medium'/>" + body.total.toString() + " tickets found with the specified criteria</speak>",
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                alexaResponse.tell(speechOutput);
             }
         });
     },
