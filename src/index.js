@@ -76,7 +76,7 @@ JiraManager.prototype.intentHandlers = {
                     type: AlexaSkill.speechOutputType.SSML
                 };
                 repromptOutput = {
-                    speech: "What else can I help with?",
+                    speech: "<speak>" + "What else can I help with?" + "</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
                 alexaResponse.ask(speechOutput, repromptOutput);
@@ -101,7 +101,7 @@ JiraManager.prototype.intentHandlers = {
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     repromptOutput = {
-                        speech: "What else can I help with?",
+                        speech: "<speak>" + "What else can I help with?" + "</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.ask(speechOutput, repromptOutput);
