@@ -51,7 +51,7 @@ JiraManager.prototype.intentHandlers = {
             }
         }
         console.log(jql);
-        return request({
+        request({
             url: config.endpoint,
             method: "POST",
             json: true,
