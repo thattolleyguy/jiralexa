@@ -1,4 +1,4 @@
-![Alt text](./images/108.png?raw=false)
+![Alt text](./images/108@2x.png?raw=false)
 
 ##Jira-AWS Lambda function for Alexa
 
