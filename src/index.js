@@ -16,14 +16,14 @@ var request = require('request');
 
 var appId = config.appId;
 
-var JiraManager = function () {
+var JirAlexa = function () {
     AlexaSkill.call(this, appId);
 };
 
-JiraManager.prototype = Object.create(AlexaSkill.prototype);
-JiraManager.prototype.constructor = JiraManager;
+JirAlexa.prototype = Object.create(AlexaSkill.prototype);
+JirAlexa.prototype.constructor = JirAlexa;
 
-JiraManager.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
+JirAlexa.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
     var speechText = "Welcome to the Jira Helper. You can ask a question like, what's the current status for this ticket? ... Now, what can I help you with.";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
@@ -31,7 +31,7 @@ JiraManager.prototype.eventHandlers.onLaunch = function (launchRequest, session,
     response.ask(speechText, repromptText);
 };
 
-JiraManager.prototype.intentHandlers = {
+JirAlexa.prototype.intentHandlers = {
     "GetTicketStatus": function (intent, session, alexaResponse) {
         var projectSlot = intent.slots.Project;
         var ticketNumberSlot = intent.slots.TicketNumber;
@@ -129,7 +129,7 @@ JiraManager.prototype.intentHandlers = {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) " + " AND assignee = '" + usernameSlot.value + "'" + " ORDER BY created DESC";
         }
         console.log(jql);
-        return request({
+        request({
             url: config.endpoint,
             method: "POST",
             json: true,
@@ -192,6 +192,6 @@ JiraManager.prototype.intentHandlers = {
 };
 
 exports.handler = function (event, context) {
-    var jiraManager = new JiraManager();
-    jiraManager.execute(event, context);
+    var jirAlexa = new JirAlexa();
+    jirAlexa.execute(event, context);
 };
