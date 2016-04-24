@@ -1,3 +1,5 @@
+![Alt text](./images/108.png?raw=false)
+
 ##Jira-AWS Lambda function for Alexa
 
 ### Setup
