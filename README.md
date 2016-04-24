@@ -12,7 +12,7 @@ To run this example skill you need to do two things. The first is to deploy the 
 4. Name the Lambda Function "Jira".
 5. Select the runtime as Node.js.
 6. Go to the the root directory and execute `./gradlew clean buildAlexaSkillZip`.
-7. Select Code entry type as "Upload a .ZIP file" and then upload the `./build/distribution/jiralexa-0.0.1.zip` to the Lambda.
+7. Select Code entry type as "Upload a .ZIP file" and then upload the file `build/distribution/jiralexa-0.0.1.zip` to the Lambda.
 8. Keep the Handler as index.handler (this refers to the main js file in the zip).
 9. Create a basic execution role and click create.
 10. Leave the Advanced settings as the defaults.
