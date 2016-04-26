@@ -36,10 +36,20 @@ JirAlexa.prototype.intentHandlers = {
         var projectSlot = intent.slots.Project;
         var ticketNumberSlot = intent.slots.TicketNumber;
         var rangeSlot = intent.slots.Range;
-        var jql, speechOutput, repromptOutput, speech;
+        var hasProject = projectSlot && projectSlot.value;
 
         var hasTicketNumber = ticketNumberSlot && ticketNumberSlot.value;
         var hasRange = rangeSlot && rangeSlot.value;
+
+        if (!hasProject) {
+            speechOutput = {
+                speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            return alexaResponse.tell(speechOutput);
+        }
+
+        var jql, speechOutput, repromptOutput, speech;
 
         if (hasTicketNumber) {
             jql = "key=" + projectSlot.value.toUpperCase() + "-" + ticketNumberSlot.value.toString();
@@ -50,7 +60,9 @@ JirAlexa.prototype.intentHandlers = {
                 jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) ORDER BY created DESC";
             }
         }
+
         console.log(jql);
+
         request({
             url: config.endpoint,
             method: "POST",
@@ -79,7 +91,7 @@ JirAlexa.prototype.intentHandlers = {
                     speech: "<speak>" + "What else can I help with?" + "</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
-                alexaResponse.ask(speechOutput, repromptOutput);
+                return alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 console.log(response.statusCode, body);
                 if (hasTicketNumber) {
@@ -104,13 +116,13 @@ JirAlexa.prototype.intentHandlers = {
                         speech: "<speak>" + "What else can I help with?" + "</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
-                    alexaResponse.ask(speechOutput, repromptOutput);
+                    return alexaResponse.ask(speechOutput, repromptOutput);
                 } else {
                     speechOutput = {
                         speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
-                    alexaResponse.tell(speechOutput);
+                    return alexaResponse.tell(speechOutput);
                 }
             }
         });
@@ -120,7 +132,18 @@ JirAlexa.prototype.intentHandlers = {
         var projectSlot = intent.slots.Project;
         var statusSlot = intent.slots.Status;
 
+        var hasUsername = usernameSlot && usernameSlot.value;
+        var hasProject = projectSlot && projectSlot.value;
         var hasStatus = statusSlot && statusSlot.value;
+
+        if (!hasUsername || !hasProject) {
+            speechOutput = {
+                speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
+                type: AlexaSkill.speechOutputType.SSML
+            };
+            return alexaResponse.tell(speechOutput);
+        }
+
         var jql, speechOutput, repromptOutput, speech;
 
         if (hasStatus) {
@@ -128,7 +151,9 @@ JirAlexa.prototype.intentHandlers = {
         } else {
             jql = "project=" + projectSlot.value.toUpperCase() + " AND status in (Open, \"In Progress\", Reopened) " + " AND assignee = '" + usernameSlot.value + "'" + " ORDER BY created DESC";
         }
+
         console.log(jql);
+
         request({
             url: config.endpoint,
             method: "POST",
@@ -157,14 +182,14 @@ JirAlexa.prototype.intentHandlers = {
                     speech: "What else can I help with?",
                     type: AlexaSkill.speechOutputType.SSML
                 };
-                alexaResponse.ask(speechOutput, repromptOutput);
+                return alexaResponse.ask(speechOutput, repromptOutput);
             } else {
                 console.log(response.statusCode, body);
                 speechOutput = {
                     speech: "<speak>There are<break strength='medium'/>" + body.total.toString() + " tickets found with the specified criteria</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
-                alexaResponse.tell(speechOutput);
+                return alexaResponse.tell(speechOutput);
             }
         });
     },
