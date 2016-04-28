@@ -46,7 +46,8 @@ JirAlexa.prototype.intentHandlers = {
                 speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
                 type: AlexaSkill.speechOutputType.SSML
             };
-            return alexaResponse.tell(speechOutput);
+            alexaResponse.tell(speechOutput);
+            return false;
         }
 
         var jql, speechOutput, repromptOutput, speech;
@@ -91,7 +92,8 @@ JirAlexa.prototype.intentHandlers = {
                     speech: "<speak>" + "What else can I help with?" + "</speak>",
                     type: AlexaSkill.speechOutputType.SSML
                 };
-                return alexaResponse.ask(speechOutput, repromptOutput);
+                alexaResponse.ask(speechOutput, repromptOutput);
+                return true;
             } else {
                 console.log(response.statusCode, body);
                 if (hasTicketNumber) {
@@ -116,13 +118,15 @@ JirAlexa.prototype.intentHandlers = {
                         speech: "<speak>" + "What else can I help with?" + "</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
-                    return alexaResponse.ask(speechOutput, repromptOutput);
+                    alexaResponse.ask(speechOutput, repromptOutput);
+                    return true;
                 } else {
                     speechOutput = {
                         speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
-                    return alexaResponse.tell(speechOutput);
+                    alexaResponse.tell(speechOutput);
+                    return false;
                 }
             }
         });
@@ -141,7 +145,8 @@ JirAlexa.prototype.intentHandlers = {
                 speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
                 type: AlexaSkill.speechOutputType.SSML
             };
-            return alexaResponse.tell(speechOutput);
+            alexaResponse.tell(speechOutput);
+            return false;
         }
 
         var jql, speechOutput, repromptOutput, speech;
@@ -182,24 +187,35 @@ JirAlexa.prototype.intentHandlers = {
                     speech: "What else can I help with?",
                     type: AlexaSkill.speechOutputType.SSML
                 };
-                return alexaResponse.ask(speechOutput, repromptOutput);
+                alexaResponse.ask(speechOutput, repromptOutput);
+                return true;
             } else {
                 console.log(response.statusCode, body);
-                speechOutput = {
-                    speech: "<speak>There are<break strength='medium'/>" + body.total.toString() + " tickets found with the specified criteria</speak>",
-                    type: AlexaSkill.speechOutputType.SSML
-                };
-                return alexaResponse.tell(speechOutput);
+                if (response.statusCode === 200) {
+                    speechOutput = {
+                        speech: "<speak>There are<break strength='medium'/>" + body.total.toString() + " tickets found with the specified criteria</speak>",
+                        type: AlexaSkill.speechOutputType.SSML
+                    };
+                } else {
+                    speechOutput = {
+                        speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
+                        type: AlexaSkill.speechOutputType.SSML
+                    };
+                }
+                alexaResponse.tell(speechOutput);
+                return false;
             }
         });
     },
     "AMAZON.StopIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
         response.tell(speechOutput);
+        return false;
     },
     "AMAZON.CancelIntent": function (intent, session, response) {
         var speechOutput = "Goodbye";
         response.tell(speechOutput);
+        return false;
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
         var speechText = "You can ask questions about Jira Status such as, what's the number of open tickets for Spring, or, you can say exit... Now, what can I help you with?";
@@ -213,6 +229,7 @@ JirAlexa.prototype.intentHandlers = {
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
         };
         response.ask(speechOutput, repromptOutput);
+        return true;
     }
 };
 
