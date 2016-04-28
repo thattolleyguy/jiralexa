@@ -96,33 +96,42 @@ JirAlexa.prototype.intentHandlers = {
                 return true;
             } else {
                 console.log(response.statusCode, body);
-                if (hasTicketNumber) {
-                    if (body.total === 0) {
-                        speech = "<speak>I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as></speak>";
+                if (response.statusCode === 200) {
+                    if (hasTicketNumber) {
+                        if (body.total === 0) {
+                            speech = "<speak>I'm sorry, I currently do not know the status for ticket " + projectSlot.value + " - " + "<say-as interpret-as='digits'/>" + ticketNumberSlot.value.toString() + "</say-as></speak>";
+                        } else {
+                            speech = "" +
+                                "<speak>" +
+                                "<p>The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:</p>" +
+                                "<p>Description:<break time='0.5s'/>" + body.issues[0].fields.summary + "</p>" +
+                                "<p>Priority:<break time='0.5s'/>" + body.issues[0].fields.priority.name + "</p>" +
+                                "<p>Reporter:<break time='0.5s'/>" + body.issues[0].fields.reporter.name + "</p>" +
+                                "<p>Type:<break time='0.5s'/>" + body.issues[0].fields.issuetype.name + "</p>" +
+                                "<p>Status:<break time='0.5s'/>" + body.issues[0].fields.status.name + "</p>" +
+                                "</speak>";
+                        }
+                        speechOutput = {
+                            speech: speech,
+                            type: AlexaSkill.speechOutputType.SSML
+                        };
+                        repromptOutput = {
+                            speech: "<speak>" + "What else can I help with?" + "</speak>",
+                            type: AlexaSkill.speechOutputType.SSML
+                        };
+                        alexaResponse.ask(speechOutput, repromptOutput);
+                        return true;
                     } else {
-                        speech = "" +
-                            "<speak>" +
-                            "<p>The Summary for ticket " + projectSlot.value + "<say-as interpret-as='digits'>" + ticketNumberSlot.value + "</say-as>" + " is the following:</p>" +
-                            "<p>Description:<break time='0.5s'/>" + body.issues[0].fields.summary + "</p>" +
-                            "<p>Priority:<break time='0.5s'/>" + body.issues[0].fields.priority.name + "</p>" +
-                            "<p>Reporter:<break time='0.5s'/>" + body.issues[0].fields.reporter.name + "</p>" +
-                            "<p>Type:<break time='0.5s'/>" + body.issues[0].fields.issuetype.name + "</p>" +
-                            "<p>Status:<break time='0.5s'/>" + body.issues[0].fields.status.name + "</p>" +
-                            "</speak>";
+                        speechOutput = {
+                            speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
+                            type: AlexaSkill.speechOutputType.SSML
+                        };
+                        alexaResponse.tell(speechOutput);
+                        return false;
                     }
-                    speechOutput = {
-                        speech: speech,
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    repromptOutput = {
-                        speech: "<speak>" + "What else can I help with?" + "</speak>",
-                        type: AlexaSkill.speechOutputType.SSML
-                    };
-                    alexaResponse.ask(speechOutput, repromptOutput);
-                    return true;
                 } else {
                     speechOutput = {
-                        speech: "<speak>There are<break strength='medium'/>" + body.total + " tickets found with the specified criteria</speak>",
+                        speech: "<speak>" + "I'm sorry, I couldn't find the information looking for." + "</speak>",
                         type: AlexaSkill.speechOutputType.SSML
                     };
                     alexaResponse.tell(speechOutput);
