@@ -24,7 +24,7 @@ JirAlexa.prototype = Object.create(AlexaSkill.prototype);
 JirAlexa.prototype.constructor = JirAlexa;
 
 JirAlexa.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
-    var speechText = "Welcome to the Jira Helper. You can ask a question like, what's the current status for this ticket? ... Now, what can I help you with.";
+    var speechText = "Welcome to the Bug Tracker. You can ask a question like, what's the number of open tickets for Kafka?... Now, what can I help you with.";
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     var repromptText = "For instructions on what you can say, please say help me.";
@@ -64,7 +64,7 @@ JirAlexa.prototype.intentHandlers = {
 
         console.log(jql);
 
-        request({
+        return request({
             url: config.endpoint,
             method: "POST",
             json: true,
@@ -168,7 +168,7 @@ JirAlexa.prototype.intentHandlers = {
 
         console.log(jql);
 
-        request({
+        return request({
             url: config.endpoint,
             method: "POST",
             json: true,
@@ -227,8 +227,8 @@ JirAlexa.prototype.intentHandlers = {
         return false;
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
-        var speechText = "You can ask questions about Jira Status such as, what's the number of open tickets for Spring, or, you can say exit... Now, what can I help you with?";
-        var repromptText = "You can say things like, what's the number of open tickets for Spring, or you can say exit... Now, what can I help you with?";
+        var speechText = "You can ask questions about Ticket Status such as, what's the number of open tickets for Kafka, or, you can say exit... Now, what can I help you with?";
+        var repromptText = "You can say things like, what's the number of open tickets for Kafka, or you can say exit... Now, what can I help you with?";
         var speechOutput = {
             speech: speechText,
             type: AlexaSkill.speechOutputType.PLAIN_TEXT
